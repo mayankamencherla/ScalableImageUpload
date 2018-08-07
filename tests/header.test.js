@@ -54,3 +54,54 @@ test('clicking starts oAuth', async() => {
 
   await browser.close();
 });
+
+test('When signed in, shows logout button', async() => {
+  const id = '5b65ba970e83500a86a45c54';
+
+  const Buffer = require('safe-buffer').Buffer;
+
+  const sessionObj = {
+    passport: {
+      user: id
+    }
+  };
+
+  const sessionString = Buffer.from(JSON.stringify(sessionObj))
+                              .toString('base64');
+
+  const KeyGrip = require('keyGrip');
+
+  const keys = require('../config/keys.js');
+
+  const kg = new KeyGrip([keys.cookieKey]);
+
+  const sig = kg.sign('session=' + sessionString);
+
+  console.log(sessionString, sig);
+
+  // launch takes in options
+  const options = {headless: false};
+  const browser = await puppeteer.launch(options);
+
+  // Create page - or a tab on chromium
+  const page = await browser.newPage();
+
+  await page.goto('localhost:3000');
+
+  await page.setCookie({
+    name: 'session',
+    value: sessionString
+  });
+
+  await page.setCookie({
+    name: 'session.sig',
+    value: sig
+  });
+
+  await page.goto('localhost:3000');
+  await page.waitFor('a[href="/auth/logout"]');
+
+  const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML);
+
+  expect(text).toEqual('Logout');
+});
