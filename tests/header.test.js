@@ -1,48 +1,34 @@
-const puppeteer = require('puppeteer');
+const {Page} = require('./helpers/page');
 
 test('We can launch a browser', async () => {
 
-  // launch takes in options
-  const options = {headless: false};
-  const browser = await puppeteer.launch(options);
-
-  // Create page - or a tab on chromium
-  const page = await browser.newPage();
+  const page = await Page.build();
 
   await page.goto('localhost:3000');
 
-  const text = await page.$eval('a.brand-logo', el => el.innerHTML);
+  const text = await page.getContentsOf('a.brand-logo');
 
   expect(text).toEqual('Blogster');
 
-  await browser.close();
+  await page.close();
 });
 
 test('We can launch a browser', async () => {
 
-  // launch takes in options
-  const options = {headless: false};
-  const browser = await puppeteer.launch(options);
-
-  // Create page - or a tab on chromium
-  const page = await browser.newPage();
+  const page = await Page.build();
 
   await page.goto('localhost:3000');
 
-  const text = await page.$eval('a.brand-logo', el => el.innerHTML);
+  const text = await page.getContentsOf('a.brand-logo');
 
   expect(text).toEqual('Blogster');
 
-  await browser.close();
+  await page.close();
 });
 
 test('clicking starts oAuth', async() => {
-  // launch takes in options
-  const options = {headless: false};
-  const browser = await puppeteer.launch(options);
 
-  // Create page - or a tab on chromium
-  const page = await browser.newPage();
+  const page = await Page.build();
 
   await page.goto('localhost:3000');
 
@@ -52,56 +38,17 @@ test('clicking starts oAuth', async() => {
 
   expect(url).toMatch(/accounts\.google\.com/);
 
-  await browser.close();
+  await page.close();
 });
 
 test('When signed in, shows logout button', async() => {
   const id = '5b65ba970e83500a86a45c54';
 
-  const Buffer = require('safe-buffer').Buffer;
+  const page = await Page.build();
 
-  const sessionObj = {
-    passport: {
-      user: id
-    }
-  };
+  await page.login();
 
-  const sessionString = Buffer.from(JSON.stringify(sessionObj))
-                              .toString('base64');
-
-  const KeyGrip = require('keyGrip');
-
-  const keys = require('../config/keys.js');
-
-  const kg = new KeyGrip([keys.cookieKey]);
-
-  const sig = kg.sign('session=' + sessionString);
-
-  console.log(sessionString, sig);
-
-  // launch takes in options
-  const options = {headless: false};
-  const browser = await puppeteer.launch(options);
-
-  // Create page - or a tab on chromium
-  const page = await browser.newPage();
-
-  await page.goto('localhost:3000');
-
-  await page.setCookie({
-    name: 'session',
-    value: sessionString
-  });
-
-  await page.setCookie({
-    name: 'session.sig',
-    value: sig
-  });
-
-  await page.goto('localhost:3000');
-  await page.waitFor('a[href="/auth/logout"]');
-
-  const text = await page.$eval('a[href="/auth/logout"]', el => el.innerHTML);
+  const text = await page.getContentsOf('a[href="/auth/logout');
 
   expect(text).toEqual('Logout');
 });
