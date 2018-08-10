@@ -89,18 +89,8 @@ describe('When user not logged in', async() => {
     const page = await Page.build();
     await page.goto('localhost:3000');
 
-    const result = await page.evaluate(
-      () => {
-        return fetch('/api/blogs', {
-          method: 'POST',
-          credentials: 'same-origin',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({title: 'My title', content: 'My content'});
-        }).then(res => res.json());
-      }
-    );
+    const result = await page.post('/api/blogs',
+                  {title: 'My title', content: 'My content'});
 
     expect(result).toEqual({error: 'You must log in!'});
   });
@@ -109,17 +99,7 @@ describe('When user not logged in', async() => {
     const page = await Page.build();
     await page.goto('localhost:3000');
 
-    const result = await page.evaluate(
-      () => {
-        return fetch('/api/blogs', {
-          method: 'GET',
-          credentials: 'same-origin',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }).then(res => res.json());
-      }
-    );
+    const result = await page.get('/api/blogs');
 
     expect(result).toEqual({error: 'You must log in!'});
   });
