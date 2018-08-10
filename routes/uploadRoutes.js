@@ -14,7 +14,7 @@ module.exports = app => {
 
     s3.getSignedUrl('putObject', {
       Bucket: 'my-blog-mayankamencherla-bucket-123',
-      ContentType: 'jpeg',
+      ContentType: 'image/jpeg',
       Key: key
     }, (err, url) => res.send({key, url}));
   });
