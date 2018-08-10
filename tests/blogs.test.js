@@ -104,4 +104,23 @@ describe('When user not logged in', async() => {
 
     expect(result).toEqual({error: 'You must log in!'});
   });
+
+  test('Cannot view posts', async() => {
+    const page = await Page.build();
+    await page.goto('localhost:3000');
+
+    const result = await page.evaluate(
+      () => {
+        return fetch('/api/blogs', {
+          method: 'GET',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }).then(res => res.json());
+      }
+    );
+
+    expect(result).toEqual({error: 'You must log in!'});
+  });
 });
