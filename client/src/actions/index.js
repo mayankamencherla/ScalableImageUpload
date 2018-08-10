@@ -24,6 +24,7 @@ export const submitBlog = (values, file, history) => async dispatch => {
 
   const res = await axios.post('/api/blogs', {
     ...values,
+    // Sending imageUrl to be the userId/fileName
     imageUrl: uploadConfig.data.key
   });
 
